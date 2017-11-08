@@ -210,6 +210,10 @@ public class GameActivity extends AppCompatActivity
         if ( player.getRow() == zombie.getRow() && player.getCol() == zombie.getCol() )
         {
             losses++;
+            playerImageView = (ImageView) layoutInflater.inflate(R.layout.blood_layout, null);
+            playerImageView.setX(player.getCol() * SQUARE + OFFSET);
+            playerImageView.setY(player.getRow() * SQUARE + OFFSET);
+            activityGameRelativeLayout.addView(playerImageView);
             startNewGame();
         }
 
