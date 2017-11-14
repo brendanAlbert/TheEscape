@@ -13,7 +13,28 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * GameActivity is the main controller of 'The Escape'.
+ *
+ * We declare a GestureDetector, set a FLING_THRESHOLD constant.
+ * These will be used to detect the User's flings which will tell
+ * the player's character which way to move.
+ *
+ * We also instantiate constants such as SQUARE and OFFSET, COLS and ROWS,
+ * these are used along with the gameBoard[][] two-dimensional array
+ * to build the game board.
+ *
+ * There are also RelativeLayout Views, ImageViews, and TextViews to be inflated.
+ *
+ * Also among the member variables:
+ *  - a List of ImageViews so we know how many views to inflate
+ *  - player object
+ *  - zombie object
+ *  - coordinates of the row and column of the exit
+ *  - number of wins / losses
+ *  - a LayoutInflater object
+ *
+ */
 public class GameActivity extends AppCompatActivity
         implements GestureDetector.OnGestureListener {
 
@@ -23,7 +44,7 @@ public class GameActivity extends AppCompatActivity
     final int FLING_THRESHOLD = 500;
 
     //BOARD INFORMATION
-    final int SQUARE = 200;
+    final int SQUARE = 180;
     final int OFFSET = 5;
     final int COLS = 8;
     final int ROWS = 8;
@@ -57,6 +78,18 @@ public class GameActivity extends AppCompatActivity
 
     private LayoutInflater layoutInflater;
 
+    /**
+     * onCreate is called when the app is started or the context changes ( i.e. the user rotates
+     * the device )
+     *
+     * We set the content view.  All of the View widgets are wired up.
+     * The layoutInflate object is instantiated,
+     * the allGameObjects list of ImageViews is instantiated,
+     * and a gestureDetector is instantiated.
+     *
+     * startNewGame is called to begin the game.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +109,15 @@ public class GameActivity extends AppCompatActivity
 
     }
 
+    /**
+     * When startNewGame is called, all the views on the game board are removed,
+     * and the gameObjects are cleared.
+     *
+     * buildGameBoard is called, createZombie is called and createPlayer is called.
+     *
+     * Lastly, the number of wins and losses are set to their respective TextViews.
+     *
+     */
     private void startNewGame() {
         //TASK 1:  CLEAR THE BOARD (ALL IMAGE VIEWS)
         /*
@@ -99,9 +141,19 @@ public class GameActivity extends AppCompatActivity
         lossesTextView.setText(getString(R.string.losses, losses));
     }
 
+    /**
+     * buildGameBoard is called from startNewGame().
+     * Using doubly-nested for-loops, we inflate all the obstacle locations, and the exit.
+     * If the location is an obstacle, we inflate an obstacle layout.
+     * If the location is the exit , we inflate the exit layout, and assign the exitRow/exitCol
+     * coordinates.
+     *
+     * If the view to inflate is present (not null), we set the X and Y of the view.  We add the
+     * view to the activityGameRelativeLayout and to the list of allGameObjects.
+     */
     private void buildGameBoard() {
-        // TODO: Inflate the entire game board (obstacles and exit)
-        // TODO: (everything but the player and zombie)
+        // COMPLETED: Inflate the entire game board (obstacles and exit)
+        // COMPLETED: (everything but the player and zombie)
 
         ImageView viewToInflate;
         // Loop through the board
@@ -134,6 +186,13 @@ public class GameActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * createZombie is called from startNewGame().
+     *
+     * The position the zombie starts at is defined here.
+     * Its layout is inflated.
+     * A new Zombie object is instantiated and its position coordinates are set.
+     */
     private void createZombie() {
         // TODO: Determine where to place the Zombie (at game start)
         // TODO: Then, inflate the zombie layout
@@ -150,6 +209,13 @@ public class GameActivity extends AppCompatActivity
         zombie.setCol(col);
     }
 
+    /**
+     * createPlayer is called from startNewGame().
+     *
+     * The position the player starts at is defined here.
+     * Their layout is inflated.
+     * A new Player object is instantiated and their position coordinates are set.
+     */
     private void createPlayer() {
         // TODO: Determine where to place the Player (at game start)
         // TODO: Then, inflate the player layout
@@ -167,6 +233,21 @@ public class GameActivity extends AppCompatActivity
     }
 
 
+    /**
+     * movePlayer is called from onFling with the x and y velocities of the fling.
+     * The absolute values of the velocities are obtained.
+     * An if else statement checks which velocity was the greatest and direction
+     * is assigned that movement.
+     *
+     * The player is moved in that direction and their imageView is positioned accordingly.
+     * Then the zombie moves towards the player and its imageView is drawn.
+     *
+     * After the move, we check if the player won, by having the same coordinates as the exit,
+     * or lost, by having the same coordinates as the zombie.  The respective counter is then
+     * incremented and startNewGame is called.
+     * @param velocityX
+     * @param velocityY
+     */
     private void movePlayer(float velocityX, float velocityY) {
         // TODO: This method gets called by the onFling event
         // TODO: Be sure to implement the move method in the Player (model) class
@@ -174,7 +255,7 @@ public class GameActivity extends AppCompatActivity
         float absX = Math.abs(velocityX);
         float absY = Math.abs(velocityY);
 
-        String direction = "UNKNOWN";
+        String direction;
 
         // TODO: Determine which absolute velocity is greater (x or y)
         // x is bigger (move left or right)
@@ -216,43 +297,98 @@ public class GameActivity extends AppCompatActivity
             activityGameRelativeLayout.addView(playerImageView);
             startNewGame();
         }
-
-
-
     }
 
+    /**
+     * onTouchEvent is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * When an onTouchEvent is detected, the detected event is passed into
+     * gestureDetector.OnTouchEvent(event) and a boolean is returned.
+     * @param event
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return gestureDetector.onTouchEvent(event);
     }
 
+    /**
+     * onDown is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * The current implementation of the game does not do anything with this callback method
+     * but it must be implemented.
+     * @param motionEvent
+     */
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         return false;
     }
 
+    /**
+     * onShowPress is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * The current implementation of the game does not do anything with this callback method
+     * but it must be implemented.
+     * @param motionEvent
+     */
     @Override
-    public void onShowPress(MotionEvent motionEvent) {
+    public void onShowPress(MotionEvent motionEvent) {}
 
-    }
-
+    /**
+     * onSingleTapUp is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * The current implementation of the game does not do anything with this callback method
+     * but it must be implemented.
+     * @param motionEvent
+     */
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
         return false;
     }
 
+    /**
+     * onScroll is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * The current implementation of the game does not do anything with this callback method
+     * but it must be implemented.
+     * @param motionEvent
+     * @param motionEvent1
+     * @param v
+     * @param v1
+     */
     @Override
-    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
-    }
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) { return false; }
 
+    /**
+     * onLongPress is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * The current implementation of the game does not do anything with this callback method
+     * but it must be implemented.
+     * @param motionEvent
+     */
     @Override
-    public void onLongPress(MotionEvent motionEvent) {
+    public void onLongPress(MotionEvent motionEvent) {}
 
-    }
-
+    /**
+     * onFling is a necessarily implemented callback method of GestureDetector.OnGestureListener
+     * which this class implements.
+     *
+     * When an onFling event is detected, the movePlayer method is called using the
+     * velocityX / velocityY arguments, and true is returned.
+     * @param motionEvent
+     * @param motionEvent1
+     * @param velocityX the speed of the User's fling in the X direction
+     * @param velocityY the speed of the User's fling in the Y direction
+     * @return
+     */
     @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float velocityX, float velocityY) {
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float velocityX, float velocityY)
+    {
         movePlayer(velocityX, velocityY);
         return true;
     }
